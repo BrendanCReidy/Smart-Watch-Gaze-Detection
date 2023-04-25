@@ -1,0 +1,13 @@
+﻿Object,x,y,z,Type
+Note 1,62.5,0,71,IoT Device
+Note 2,76.5,0,71,IoT Device
+Note 3,87.5,0,71,IoT Device
+Note 4,76.5,0,41,IoT Device
+Note 5,173,109,64,IoT Device
+Ceiling Light,57,48,78.5,IoT Device
+TV,247,96,31,IoT Device
+Table Lamp,172.5,8,53,IoT Device
+Red Lamp,267,10.5,52,IoT Device
+WP 1,57,57.5,0,Waypoint
+WP 2,134,76,0,Waypoint
+WP 3,210.5,61,0,Waypoint
