@@ -35,6 +35,7 @@ class Engine():
     def __init__(self, coordinate_file, coordinate_translation=(1,1,1)):
         self.coordinate_system = pd.read_csv(coordinate_file)
         self.coordinate_translation = coordinate_translation
+        self.arm_length = 26
         self.start_position = (117,21,41)
         self.fig = plt.figure()
         self.ax = self.fig.add_subplot(111, projection='3d')
@@ -49,11 +50,14 @@ class Engine():
         default = np.zeros((11,11))    
         self.surface = self.ax.plot_surface(default, default, default)
 
-        max_coord = -999999
         self.objects = {}
-        for idx, row in self.coordinate_system.iterrows():
+        self.waypoints = {}
+        max_coord = -999999
+        for _, row in self.coordinate_system.iterrows():
             if row["Type"]=="IoT Device":
                 self.objects[row["Object"]] = np.array([row["x"], row["y"], row["z"]])
+            elif row["Type"]=="Waypoint":
+                self.waypoints[row["Object"]] = np.array([row["x"], row["y"], row["z"]])
             self.ax.scatter(row["x"], row["y"], row["z"])
             max_coord = max(np.max(np.abs(np.array([row["x"], row["y"], row["z"]]))), max_coord)
 
@@ -66,6 +70,11 @@ class Engine():
         self.ax.set_zlabel('Z')
         plt.gca().invert_xaxis()
         plt.show(block=False)
+
+    def setStartWaypoint(self, waypointName):
+        self.start_position = self.waypoints[waypointName]
+
+    
 
 
     def update(self, orientation):
@@ -120,13 +129,17 @@ class Engine():
         t = pitch + 3.14/2
         s = yaw + 3.14/2
 
+        xOffset = self.arm_length*np.cos(s)*np.sin(t)
+        yOffset = self.arm_length*np.sin(s)*np.sin(t)
+        zOffset = self.arm_length*np.cos(t)
+
         rayX = radius*np.cos(s)*np.sin(t)
         rayY = radius*np.sin(s)*np.sin(t)
         rayZ = radius*np.cos(t)
 
-        rayX+=x
-        rayY+=y
-        rayZ+=z
+        rayX+=(x+xOffset)
+        rayY+=(y+yOffset)
+        rayZ+=(z+zOffset)
 
         for obj in self.delete:
             obj.remove()

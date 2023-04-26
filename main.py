@@ -51,43 +51,34 @@ def tcp_listen():
             t_arr.append(t)
             accel_data.append(accel)
             gyro_data.append(gyro)
-            #print(accel)
-            #acceleration = dict(json_data)
             if len(accel_data)>sample_num:
-                #accel_data=accel_data[:sample_num]
-                #gyro_data=gyro_data[:sample_num]
                 orientation, gyro2, acc2 = comp.complimentaryFilter(np.array(accel_data, dtype=np.float32),np.array(gyro_data, dtype=np.float32),highpass=highpass,lowpass=lowpass, t=np.array(t_arr, dtype=np.float64))
-                #for i in range(len(orientation)):
-                #    x,y,z = orientation[i]
-                #    orientation[i] = np.array([fix_angle(x), fix_angle(y), fix_angle(z)])
-                #orientation= np.unwrap(orientation)
+                orientation = np.unwrap(orientation, axis=0)
                 last_value = orientation[-1]
-                x,y,z = last_value
-                #x,y,z = fix_angle(x), fix_angle(y), fix_angle(z)
-                ANGLES = np.array([x,y,z])
-                #print(x,y,z)
-                accel_x, accel_y, accel_z = accel
-                #print("ANGL %.5f \t %.5f \t %.5f" % (math.degrees(x)+180,math.degrees(y),math.degrees(z)))
-                #print("ANGL %.5f \t %.5f \t %.5f" % (x,y,z))
+                deg = np.degrees(orientation)
+                if np.any(np.abs(np.diff(deg[-2:],axis=0))>10):
+                    print(deg[-2:])
+                    print(np.diff(deg[-2:],axis=0))
 
-                #print("ACEL %.5f \t %.5f \t %.5f" % (accel_x,accel_y,accel_z))
-                #accel_data = []
-                #gyro_data = []
+                x,y,z = last_value
+                ANGLES = np.array([x,y,z])
+                #print("ANGL %.5f \t %.5f \t %.5f" % (math.degrees(x)+180,math.degrees(y),math.degrees(z)))
 
 threading.Thread(target=tcp_listen).start()
 
-def fix_angle(angle):
-    #while(angle >= 3.14): #angle in radians
-    #    angle -= 2*3.14
-    while(angle < 0):
-        angle += 2*3.14
-    return angle
-
 import world_engine
+import audio_engine
 engine = world_engine.Engine("smartWatchCoordinatePlane.csv", coordinate_translation=(-1,-1,-1))
+engine.setStartWaypoint("Computer Desk")
+audio = audio_engine.AudioEngine(engine.objects.keys())
+"""
 while True:
     time.sleep(1/24)
     engine.update(ANGLES)
     x,y,z = ANGLES
-    print("ANGL %.5f \t %.5f \t %.5f" % (math.degrees(x)+180,math.degrees(y),math.degrees(z)))
+    #print("ANGL %.5f \t %.5f \t %.5f" % (math.degrees(x)+180,math.degrees(y),math.degrees(z)))
     engine.raycast()
+    tts = gtts.gTTS("Hello world", lang="en")
+    tts.save("hola.mp3")
+    playsound("hola.mp3")
+"""

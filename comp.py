@@ -7,7 +7,7 @@ import scipy.signal as signal
 
 YAW_DRIFT = 1/(5900*3)
 
-fs = 30  # Sampling frequency (Hz)
+fs = 90  # Sampling frequency (Hz)
 cutoff_hz = 1/30  # Cutoff frequency (Hz)
 cutoff_hz2 = 2.5  # Cutoff frequency (Hz)
 
